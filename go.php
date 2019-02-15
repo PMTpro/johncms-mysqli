@@ -65,11 +65,11 @@ if (isset($_GET['lng'])) {
     Редирект по рекламной ссылке
     -----------------------------------------------------------------
     */
-    $req = mysql_query("SELECT * FROM `cms_ads` WHERE `id` = '$id'");
-    if (mysql_num_rows($req)) {
-        $res = mysql_fetch_assoc($req);
+    $req = $db->query("SELECT * FROM `cms_ads` WHERE `id` = '$id'");
+    if ($req->num_rows) {
+        $res = $req->fetch_assoc();
         $count_link = $res['count'] + 1;
-        mysql_query("UPDATE `cms_ads` SET `count` = '$count_link'  WHERE `id` = '$id'");
+        $db->query("UPDATE `cms_ads` SET `count` = '$count_link'  WHERE `id` = '$id'");
         header('Location: ' . $res['link']);
     } else {
         header("Location: http://johncms.com/index.php?act=404");

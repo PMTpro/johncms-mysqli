@@ -83,24 +83,24 @@ if (isset($_POST['submit'])) {
         $reg_name = functions::check(mb_substr($reg_name, 0, 20));
         $reg_about = functions::check(mb_substr($reg_about, 0, 500));
         // Проверка, занят ли ник
-        $req = mysql_query("SELECT * FROM `users` WHERE `name_lat`='" . mysql_real_escape_string($lat_nick) . "'");
-        if (mysql_num_rows($req) != 0) {
+        $req = $db->query("SELECT * FROM `users` WHERE `name_lat`='" . $db->real_escape_string($lat_nick) . "'");
+        if ($req->num_rows != 0) {
             $error['login'][] = $lng_reg['error_nick_occupied'];
         }
     }
     if (empty($error)) {
         $preg = $set['mod_reg'] > 1 ? 1 : 0;
-        mysql_query("INSERT INTO `users` SET
-            `name` = '" . mysql_real_escape_string($reg_nick) . "',
-            `name_lat` = '" . mysql_real_escape_string($lat_nick) . "',
-            `password` = '" . mysql_real_escape_string($pass) . "',
+        $db->query("INSERT INTO `users` SET
+            `name` = '" . $db->real_escape_string($reg_nick) . "',
+            `name_lat` = '" . $db->real_escape_string($lat_nick) . "',
+            `password` = '" . $db->real_escape_string($pass) . "',
             `imname` = '$reg_name',
             `about` = '$reg_about',
             `sex` = '$reg_sex',
             `rights` = '0',
             `ip` = '" . core::$ip . "',
             `ip_via_proxy` = '" . core::$ip_via_proxy . "',
-            `browser` = '" . mysql_real_escape_string($agn) . "',
+            `browser` = '" . $db->real_escape_string($agn) . "',
             `datereg` = '" . time() . "',
             `lastdate` = '" . time() . "',
             `sestime` = '" . time() . "',
@@ -109,8 +109,8 @@ if (isset($_POST['submit'])) {
             `set_forum` = '',
             `set_mail` = '',
             `smileys` = ''
-        ") or exit(__LINE__ . ': ' . mysql_error());
-        $usid = mysql_insert_id();
+        ") or exit(__LINE__ . ': ' . $db->error);
+        $usid = $db->insert_id;
 
         // Отправка системного сообщения
         $set_mail = unserialize($set['setting_mail']);
@@ -133,13 +133,13 @@ if (isset($_POST['submit'])) {
 
             $theme = str_replace($array, $array_replace, $set['them_message']);
             $system = str_replace($array, $array_replace, $set['reg_message']);
-            mysql_query("INSERT INTO `cms_mail` SET
+            $db->query("INSERT INTO `cms_mail` SET
 			    `user_id` = '0',
 			    `from_id` = '" . $usid . "',
-			    `text` = '" . mysql_real_escape_string($system) . "',
+			    `text` = '" . $db->real_escape_string($system) . "',
 			    `time` = '" . time() . "',
 			    `sys` = '1',
-			    `them` = '" . mysql_real_escape_string($theme) . "'
+			    `them` = '" . $db->real_escape_string($theme) . "'
 			");
         }
 

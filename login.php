@@ -36,9 +36,9 @@ if(core::$user_id){
         $error[] = $lng['password'] . ': ' . $lng['error_wrong_lenght'];
     if (!$error && $user_pass && $user_login) {
         // Запрос в базу на юзера
-        $req = mysql_query("SELECT * FROM `users` WHERE `name_lat`='" . functions::rus_lat(mb_strtolower($user_login)) . "' LIMIT 1");
-        if (mysql_num_rows($req)) {
-            $user = mysql_fetch_assoc($req);
+        $req = $db->query("SELECT * FROM `users` WHERE `name_lat`='" . functions::rus_lat(mb_strtolower($user_login)) . "' LIMIT 1");
+        if ($req->num_rows) {
+            $user = $req->fetch_assoc();
             if ($user['failed_login'] > 2) {
                 if ($user_code) {
                     if (mb_strlen($user_code) > 3 && $user_code == $_SESSION['code']) {
@@ -66,7 +66,7 @@ if(core::$user_id){
                 if (md5(md5($user_pass)) == $user['password']) {
                     // Если логин удачный
                     $display_form = 0;
-                    mysql_query("UPDATE `users` SET `failed_login` = '0' WHERE `id` = '" . $user['id'] . "'");
+                    $db->query("UPDATE `users` SET `failed_login` = '0' WHERE `id` = '" . $user['id'] . "'");
                     if (!$user['preg']) {
                         // Если регистрация не подтверждена
                         echo '<div class="rmenu"><p>' . $lng['registration_not_approved'] . '</p></div>';
@@ -88,7 +88,7 @@ if(core::$user_id){
                     // Если логин неудачный
                     if ($user['failed_login'] < 3) {
                         // Прибавляем к счетчику неудачных логинов
-                        mysql_query("UPDATE `users` SET `failed_login` = '" . ($user['failed_login'] + 1) . "' WHERE `id` = '" . $user['id'] . "'");
+                        $db->query("UPDATE `users` SET `failed_login` = '" . ($user['failed_login'] + 1) . "' WHERE `id` = '" . $user['id'] . "'");
                     }
                     $error[] = $lng['authorisation_not_passed'];
                 }
